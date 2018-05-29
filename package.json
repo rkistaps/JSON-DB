@@ -1,0 +1,21 @@
+{
+  "name": "json-db-engine",
+  "version": "0.0.1",
+  "description": "JSON DB Service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "JSON",
+    "DB",
+    "Node",
+    "Express.",
+    "Socket.io"
+  ],
+  "author": "kristaps taube <kristaps.taube@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
