@@ -3,70 +3,32 @@ const fs = require("fs");
 const getValue = require("get-value");
 const setValue = require("set-value");
 const unsetValue = require("unset-value");
-const log = require("./../components/log");
 
 module.exports = {
 
     error: {},
 
-    init: function(callback) {
-        
-        log.console("Initializing engine..")
+    init: function (callback) {
+
         const self = this
-        
-        // check for core db
-        fs.stat(config.engine.coreDb, function (err, stats) {
 
-            if (err && err.code == 'ENOENT') {
-                self.initialInit(function (good, error) {
-                    
-                    callback(good, error)
-
-                })
-            } else {
-                callback(true)
-            }
-
-        })
+        callback(true)
 
     },
 
-    initialInit: function (callback) {
-        
-        var self = this
-        log.console("Starting initial init..")
-
-        fs.open(config.engine.coreDb, 'wx', (err, fd) => {
-
-            if (err) {
-                callback(false, err);
-            } else {
-                fs.write(fd, '{}', function () {
-                    callback(true);
-                });
-            }
-
-        });
-
+    getDBFilePath: function (username, name) {
+        return config.engine.dataDir + '/' + username + '/' + this.processDBName(name)
     },
 
-    createDatabase: function (name, callback) {
+    processDBName: function (name) {
+        return name + '.json'
+    },
 
-        fs.open(this.getDBFileName(name), 'wx', (err, fd) => {
-
-            if (err) {
-                if (err.code === 'EEXIST') {
-                    this.setError('DB already exists');
-                    callback(false);
-                }
-            } else {
-                fs.write(fd, '{}', function () {
-                    callback(true);
-                });
-            }
-
-        });
-
-    }
+    // changing to dot notation
+    preparePath: function (path) {
+        return path.split(config.engine.pathSeparator).filter((n) => {
+            return n ? true : false
+        }).join('.')
+    },
 
 };
