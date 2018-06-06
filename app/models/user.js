@@ -4,13 +4,9 @@ const Joi = require('joi')
 
 module.exports = {
 
-    getSchema: function () {
-
-        return {
-            username: Joi.string().min(3).required(),
-            password: Joi.string().min(3).required(),
-        }
-
+    schema: {
+        username: Joi.string().min(3).required(),
+        password: Joi.string().min(3).required(),
     },
 
     get: function (username, callback) {

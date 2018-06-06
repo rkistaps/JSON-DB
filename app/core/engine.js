@@ -57,7 +57,35 @@ module.exports = {
 
     addUser: function (user, callback) {
 
+        const self = this
 
+        this.queryCoreDb('/', function (err, result) {
+
+            result['users'][user.username] = user
+            result['databases'][user.username] = []
+
+            self.setCoreDbData(result, function (result) {
+
+                callback(result)
+
+            })
+
+        })
+
+    },
+
+    setCoreDbData(data, callback) {
+        this.setDbData(config.engine.coreUser, config.engine.coreDbName, data, callback)
+    },
+
+    setDbData: function (username, database, data, callback) {
+
+        const path = this.getDBFilePath(username, database)
+        fs.writeFile(path, JSON.stringify(data), 'utf8', function () {
+
+            callback(true);
+
+        });
 
     },
 

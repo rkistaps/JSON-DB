@@ -1,6 +1,7 @@
 const Joi = require('joi')
 const UserModel = require('./../models/user')
 const PermissionCheck = require('./../components/permissionCheck')
+const Engine = require('./../core/engine')
 const functions = require('./../core/functions')
 
 module.exports = {
@@ -17,8 +18,7 @@ module.exports = {
         // create a new user
         app.post('/users', function (req, res) {
 
-            const schema = UserModel.getSchema()
-            const result = Joi.validate(req.body, schema)
+            const result = Joi.validate(req.body, UserModel.schema)
 
             if (result.error) {
                 res.status(400).send(result.error.details[0].message)
@@ -34,16 +34,14 @@ module.exports = {
 
                         functions.cryptPassword(req.body.password, function (err, hash) {
 
-                            let User = {}
-                            for (let i in schema) {
-                                User[i] = req.body[i]
-                            }
-
+                            let User = req.body
                             User.password = hash
 
-                            res.send(User)
-                        })
+                            Engine.addUser(User, function (err, added) {
+                                res.send(User)
+                            })
 
+                        })
 
                     }
 
