@@ -8,6 +8,7 @@ module.exports = {
         coreDbName: 'core',
         dataDir: __dirname + '/../data',
         pathSeparator: '/'
-    }
+    },
+    jwtSecret: 'sdjflksjdfljsdlf'
 
 }

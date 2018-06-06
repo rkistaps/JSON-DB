@@ -55,11 +55,15 @@ module.exports = {
 
     },
 
+    addUser: function (user, callback) {
+
+
+
+    },
+
     getDbData: function (username, database, callback) {
 
         const path = this.getDBFilePath(username, database)
-
-        console.log(path)
 
         fs.exists(path, function (exist) {
 

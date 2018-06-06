@@ -2,6 +2,7 @@ const config = require("./config")
 const engine = require("./engine")
 const express = require("express")
 const authController = require('./../controllers/authController')
+const usersController = require('./../controllers/usersController')
 
 module.exports = {
 
@@ -32,6 +33,8 @@ module.exports = {
     app.get('/', (req, res) => {
       res.send('Hi')
     })
+
+    usersController.register(app)
 
     app.post('/login', authController.login)
     //app.get('/auth', authController.auth)
