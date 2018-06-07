@@ -3,6 +3,7 @@ const engine = require("./engine")
 const express = require("express")
 const authController = require('./../controllers/authController')
 const usersController = require('./../controllers/usersController')
+const PermissionChecker = require('./../components/PermissionChecker')
 
 module.exports = {
 

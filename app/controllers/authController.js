@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const functions = require('./../core/functions')
 const engine = require('./../core/engine')
-const user = require('./../models/user')
+const UserModel = require('./../models/user')
 const conf = require('./../core/config')
 
 module.exports = {
@@ -12,14 +12,13 @@ module.exports = {
 
         if (body.username && body.password) {
 
-            user.get(body.username, function (err, user) {
+            UserModel.get(body.username, function (err, user) {
 
                 if (err) {
                     res.status(500).send(err)
                 } else {
 
                     if (user) {
-
 
                         functions.comparePassword(body.password, user.password, function (err, isPasswordMatch) {
 
@@ -32,9 +31,7 @@ module.exports = {
                             } else if (isPasswordMatch) {
 
                                 response = user
-                                jwt.sign({
-                                    user: user
-                                }, conf.jwtSecret, function (err, token) {
+                                jwt.sign(user, conf.jwtSecret, function (err, token) {
 
                                     if (err) {
                                         res.status(500).send(err)
@@ -53,7 +50,7 @@ module.exports = {
                         })
 
                     } else {
-                        res.status(404).send('user not found')
+                        res.status(400).send('user not found')
                     }
 
                 }

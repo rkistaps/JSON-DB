@@ -1,8 +1,7 @@
-const Joi = require('joi')
 const UserModel = require('./../models/user')
-const PermissionCheck = require('./../components/permissionCheck')
 const Engine = require('./../core/engine')
 const functions = require('./../core/functions')
+const PermChecker = require('./../components/PermissionChecker')
 
 module.exports = {
 
@@ -16,7 +15,7 @@ module.exports = {
         })
 
         // create a new user
-        app.post('/users', function (req, res) {
+        app.post('/users', PermChecker.hasPermission('create_users'), function (req, res) {
 
             const result = UserModel.validate(req.body);
 

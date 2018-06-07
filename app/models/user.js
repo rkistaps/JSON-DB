@@ -4,6 +4,8 @@ const Joi = require('joi')
 
 module.exports = {
 
+    path: 'users',
+
     schema: {
         username: Joi.string().min(3).required(),
         password: Joi.string().min(3).required(),
@@ -11,7 +13,7 @@ module.exports = {
 
     get: function (username, callback) {
 
-        Engine.queryCoreDb('/users/' + username, function (err, data) {
+        Engine.queryCoreDb('/' + this.path + '/' + username, function (err, data) {
 
             callback(err, data)
 
@@ -32,6 +34,10 @@ module.exports = {
     },
 
     create: function (user, callback) {
+
+        if (typeof user.permissions === 'undefined') {
+            user.permissions = []
+        }
 
         Engine.addUser(user, function (err, added) {
 
