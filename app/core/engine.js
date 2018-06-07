@@ -89,6 +89,31 @@ module.exports = {
 
     },
 
+    setCoreByPath: function (path, data, callback) {
+
+        this.setByPath(config.engine.coreUser, config.engine.coreDbName, path, data, callback)
+
+    },
+
+    setByPath(username, database, path, data, callback) {
+        const self = this
+        this.getDbData(username, database, function (err, dbdata) {
+
+            if (err) {
+                callback(err)
+            } else {
+
+                setValue(dbdata, self.preparePath(path), data)
+                self.setDbData(username, database, dbdata, function (result) {
+                    callback(result)
+                })
+
+            }
+
+        })
+
+    },
+
     getDbData: function (username, database, callback) {
 
         const path = this.getDBFilePath(username, database)

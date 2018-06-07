@@ -5,6 +5,7 @@ module.exports = {
 
     register: function (app) {
 
+        // list
         app.get('/permissions', PermChecker.hasPermission('list_permissions'), function (req, res) {
 
             Permission.getAll(function (err, data) {
@@ -17,6 +18,20 @@ module.exports = {
 
             })
 
+        })
+
+        // add permission
+        app.post('/permissions', PermChecker.hasPermission('manage_permissions'), function (req, res) {
+
+            Permission.create(req.body, function (err, result) {
+
+                if (err) {
+                    res.status(400).send(err)
+                } else {
+                    res.send(result)
+                }
+
+            })
 
         })
 
