@@ -30,10 +30,9 @@ module.exports = {
 
                     } else {
 
-                        console.log(authData)
-
                         if (authData.permissions.indexOf(permission) !== -1 || authData.permissions.indexOf('root') !== -1) {
 
+                            req.user = authData
                             next() // next middleware
 
                         } else {
@@ -46,13 +45,9 @@ module.exports = {
 
                 })
 
-
-                // validate token
-
             } else {
                 res.status(403).send('Authorization required')
             }
-
 
         }
 

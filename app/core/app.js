@@ -3,6 +3,7 @@ const engine = require("./engine")
 const express = require("express")
 const authController = require('./../controllers/authController')
 const usersController = require('./../controllers/usersController')
+const permissionsController = require('./../controllers/permissionsController')
 const PermissionChecker = require('./../components/PermissionChecker')
 
 module.exports = {
@@ -36,6 +37,7 @@ module.exports = {
     })
 
     usersController.register(app)
+    permissionsController.register(app)
 
     app.post('/login', authController.login)
     //app.get('/auth', authController.auth)
