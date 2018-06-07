@@ -18,11 +18,9 @@ module.exports = {
         // create a new user
         app.post('/users', function (req, res) {
 
-            const result = Joi.validate(req.body, UserModel.schema)
+            const result = UserModel.validate(req.body);
 
-            if (result.error) {
-                res.status(400).send(result.error.details[0].message)
-            } else {
+            if (result === true) { // all good
 
                 UserModel.get(req.body.username, function (err, user) {
 
@@ -37,8 +35,14 @@ module.exports = {
                             let User = req.body
                             User.password = hash
 
-                            Engine.addUser(User, function (err, added) {
-                                res.send(User)
+                            UserModel.create(User, function (err, user) {
+
+                                if (err) {
+                                    res.status(400).send(err)
+                                } else {
+                                    res.send(User)
+                                }
+
                             })
 
                         })
@@ -47,6 +51,8 @@ module.exports = {
 
                 })
 
+            } else { // validation error
+                res.status(400).send(result.details[0].message)
             }
 
         })

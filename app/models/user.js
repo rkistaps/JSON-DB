@@ -1,5 +1,5 @@
 const conf = require('./../core/config')
-const engine = require('./../core/engine')
+const Engine = require('./../core/engine')
 const Joi = require('joi')
 
 module.exports = {
@@ -11,9 +11,31 @@ module.exports = {
 
     get: function (username, callback) {
 
-        engine.queryCoreDb('/users/' + username, function (err, data) {
+        Engine.queryCoreDb('/users/' + username, function (err, data) {
 
             callback(err, data)
+
+        })
+
+    },
+
+    validate: function (user) {
+
+        const result = Joi.validate(user, this.schema)
+
+        if (result.error) {
+            return result.error
+        } else {
+            return true;
+        }
+
+    },
+
+    create: function (user, callback) {
+
+        Engine.addUser(user, function (err, added) {
+
+            callback(err, user)
 
         })
 
