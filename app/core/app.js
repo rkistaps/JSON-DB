@@ -23,6 +23,15 @@ module.exports = {
     var express_app = express()
 
     express_app.use(express.json())
+    express_app.use((err, req, res, next) => {
+
+      if (err) {
+        res.status(err.status).send(err.type)
+      } else {
+        next(err)
+      }
+    })
+
     express_app.use(PermissionChecker.setRequestUser())
 
     express_app.listen(config.port, function () {
