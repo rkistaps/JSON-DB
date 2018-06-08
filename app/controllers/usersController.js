@@ -5,17 +5,50 @@ const PermChecker = require('./../components/PermissionChecker')
 
 module.exports = {
 
+    path: '/users',
+
     register: function (app) {
 
         // list users
-        app.get('/users', function (req, res) {
+        app.get(this.path, PermChecker.hasPermission('list_users'), (req, res) => {
 
-            res.send('hi');
+            UserModel.getAll(function (err, data) {
+
+                if (err) {
+                    res.status(500).send('Internal error')
+                } else {
+                    res.send(data)
+                }
+
+            })
 
         })
 
+        // get one user
+        app.get(this.path + '/:username', PermChecker.hasPermission('list_users'), (req, res) => {
+
+            UserModel.get(req.params.username, function (err, data) {
+
+                if (err) {
+                    res.status(500).send('Internal error')
+                } else {
+
+                    if (data) {
+                        res.send(data)
+                    } else {
+                        res.status(400).send("User not found")
+                    }
+
+                }
+
+            })
+
+        })
+
+
+
         // create a new user
-        app.post('/users', PermChecker.hasPermission('create_users'), function (req, res) {
+        app.post(this.path, PermChecker.hasPermission('create_users'), function (req, res) {
 
             const result = UserModel.validate(req.body);
 

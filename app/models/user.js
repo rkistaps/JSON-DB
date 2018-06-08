@@ -4,7 +4,7 @@ const Joi = require('joi')
 
 module.exports = {
 
-    path: 'users',
+    path: '/users',
 
     schema: {
         username: Joi.string().min(3).required(),
@@ -13,7 +13,17 @@ module.exports = {
 
     get: function (username, callback) {
 
-        Engine.queryCoreDb('/' + this.path + '/' + username, function (err, data) {
+        Engine.queryCoreDb(this.path + '/' + username, function (err, data) {
+
+            callback(err, data)
+
+        })
+
+    },
+
+    getAll: function (callback) {
+
+        Engine.queryCoreDb(this.path, function (err, data) {
 
             callback(err, data)
 

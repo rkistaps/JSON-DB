@@ -78,6 +78,7 @@ module.exports = {
         this.setDbData(config.engine.coreUser, config.engine.coreDbName, data, callback)
     },
 
+
     setDbData: function (username, database, data, callback) {
 
         const path = this.getDBFilePath(username, database)

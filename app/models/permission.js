@@ -1,5 +1,6 @@
 const conf = require('./../core/config')
 const Engine = require('./../core/engine')
+const UserModel = require('./../models/user')
 const Joi = require('joi')
 
 module.exports = {
@@ -43,6 +44,45 @@ module.exports = {
             return result.error
         } else {
             return true;
+        }
+
+    },
+
+    grant: function (body, callback) {
+
+        const schema = {
+            user: Joi.string().required(),
+            permissions: Joi.array().required()
+        }
+
+        const result = Joi.validate(body, schema)
+
+        if (result.error) {
+            callback(result.error.details[0].message)
+        } else {
+
+            if (body.permissions.indexOf('root') !== -1) {
+                callback('Cant grant root permission')
+            } else {
+
+                UserModel.get(body.username, (err, user) => {
+
+                    if (user) {
+
+                        Engine.setCoreByPath('/users/' + user.username + '/permissions', body.permissions, () => {
+                            callback(false, body)
+                        })
+
+                    } else {
+
+                        callback('User not found')
+
+                    }
+
+                });
+
+            }
+
         }
 
     },
