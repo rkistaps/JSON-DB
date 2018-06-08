@@ -3,6 +3,7 @@ const fs = require("fs");
 const getValue = require("get-value");
 const setValue = require("set-value");
 const unsetValue = require("unset-value");
+const mkdirp = require('mkdirp')
 
 module.exports = {
 
@@ -39,6 +40,7 @@ module.exports = {
     queryDbData: function (username, database, path, callback) {
 
         const self = this
+
         this.getDbData(username, database, function (err, data) {
 
             if (!err) {
@@ -64,11 +66,47 @@ module.exports = {
             result['users'][user.username] = user
             result['databases'][user.username] = []
 
-            self.setCoreDbData(result, function (result) {
+            self.setCoreDbData(result, function (stored) {
 
-                callback(result)
+                callback(stored)
 
             })
+
+        })
+
+    },
+
+    addDatabase: function (username, database, callback) {
+
+        this.getCoreDbData((err, data) => {
+
+            if (data) {
+
+                const user_dbs = getValue(data, this.preparePath('/databases/' + username))
+                user_dbs.push(database)
+
+                // writting to user_dbs
+                setValue(data, this.preparePath('/databases/' + username), user_dbs)
+
+                this.setCoreDbData(data, () => {
+
+                    // user db dir
+                    var dir = config.engine.dataDir + '/' + username
+
+                    // create db file
+                    mkdirp(dir, (err) => {
+
+                        fs.writeFile(dir + '/' + database + '.json', '{}', function (err) {
+
+                            callback(true)
+
+                        });
+
+                    })
+
+                })
+
+            }
 
         })
 
@@ -84,7 +122,10 @@ module.exports = {
         const path = this.getDBFilePath(username, database)
         fs.writeFile(path, JSON.stringify(data), 'utf8', function () {
 
-            callback(true);
+
+            if (typeof callback == 'function') {
+                callback(true);
+            }
 
         });
 
@@ -112,6 +153,12 @@ module.exports = {
             }
 
         })
+
+    },
+
+    getCoreDbData: function (callback) {
+
+        this.getDbData(config.engine.coreUser, config.engine.coreDbName, callback)
 
     },
 

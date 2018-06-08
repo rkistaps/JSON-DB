@@ -49,11 +49,17 @@ module.exports = {
             user.permissions = []
         }
 
-        Engine.addUser(user, function (err, added) {
+        Engine.addUser(user, function (added) {
 
-            callback(err, user)
+            callback(added ? user : false)
 
         })
+
+    },
+
+    delete: (username, callback) => {
+
+        callback(username)
 
     }
 

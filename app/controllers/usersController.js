@@ -2,6 +2,7 @@ const UserModel = require('./../models/user')
 const Engine = require('./../core/engine')
 const functions = require('./../core/functions')
 const PermChecker = require('./../components/PermissionChecker')
+const conf = require('./../core/config')
 
 module.exports = {
 
@@ -45,8 +46,6 @@ module.exports = {
 
         })
 
-
-
         // create a new user
         app.post(this.path, PermChecker.hasPermission('create_users'), function (req, res) {
 
@@ -67,12 +66,12 @@ module.exports = {
                             let User = req.body
                             User.password = hash
 
-                            UserModel.create(User, function (err, user) {
+                            UserModel.create(User, function (created) {
 
-                                if (err) {
-                                    res.status(400).send(err)
-                                } else {
+                                if (created) {
                                     res.send(User)
+                                } else {
+                                    res.status(400).send('User was not created')
                                 }
 
                             })
@@ -85,6 +84,29 @@ module.exports = {
 
             } else { // validation error
                 res.status(400).send(result.details[0].message)
+            }
+
+        })
+
+        // delete user
+        app.delete(this.path + '/:username', PermChecker.hasPermission('delete_users'), (req, res) => {
+
+            if (req.params.username != req.user.username) {
+
+                if (req.params.username != conf.engine.coreUser) {
+
+                    UserModel.delete(req.params.username, (result) => {
+
+                        res.send('Implement me')
+
+                    })
+
+                } else {
+                    res.status(400).send('Cant delete root user')
+                }
+
+            } else {
+                res.status(400).send('Cant delete yourself')
             }
 
         })

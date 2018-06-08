@@ -3,15 +3,8 @@ const conf = require('./../core/config')
 
 module.exports = {
 
-    check: function (permission, user, callback) {
-
-        callback(true)
-
-    },
-
-    hasPermission: function (permission) {
-
-        return function (req, res, next) {
+    setRequestUser: () => {
+        return (req, res, next) => {
 
             // get token from request
             const bearer_token = req.headers['authorization']
@@ -24,29 +17,50 @@ module.exports = {
 
                 jwt.verify(token, conf.jwtSecret, function (err, authData) {
 
-                    if (err) {
+                    if (!err) { // auth is good
 
-                        res.status(403).send('Authorization required')
-
-                    } else {
-
-                        if (authData.permissions.indexOf(permission) !== -1 || authData.permissions.indexOf('root') !== -1) {
-
-                            req.user = authData
-                            next() // next middleware
-
-                        } else {
-
-                            res.status(403).send("'" + permission + "' permission is required")
-
-                        }
+                        // setting auth data
+                        req.user = authData
 
                     }
 
                 })
 
+            }
+
+            next() // next middleware
+
+        }
+    },
+
+    isAuthorized: () => {
+
+        return (req, res, next) => {
+
+            if (req.user) {
+
+                next()
+
             } else {
-                res.status(403).send('Authorization required')
+                res.status(403).send("authorization required")
+            }
+
+
+        }
+    },
+
+    hasPermission: function (permission) {
+
+        return function (req, res, next) {
+
+            if (req.user && (req.user.permissions.indexOf(permission) !== -1 || req.user.permissions.indexOf('root') !== -1)) {
+
+                next()
+
+            } else {
+
+                res.status(403).send("'" + permission + "' permission is required")
+
             }
 
         }
