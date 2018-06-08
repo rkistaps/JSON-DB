@@ -38,6 +38,33 @@ module.exports = {
 
         })
 
+    },
+
+    hasDatabase: function (user, database, callback) {
+
+        this.getByUser(user, (err, result) => {
+
+            if (result.indexOf(database) === -1) {
+                callback(false)
+            } else {
+                callback(true)
+            }
+
+        })
+
+    },
+
+    set: function (username, database, path, data, callback) {
+
+        Engine.setByPath(username, database, path, data, callback)
+
+    },
+
+    get: function (username, database, path, callback) {
+
+        Engine.queryDbData(username, database, path, callback)
+
     }
+
 
 }

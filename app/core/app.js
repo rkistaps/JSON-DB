@@ -5,6 +5,7 @@ const authController = require('./../controllers/authController')
 const usersController = require('./../controllers/usersController')
 const permissionsController = require('./../controllers/permissionsController')
 const databasesController = require('./../controllers/databasesController')
+const queryController = require('./../controllers/queryController')
 const PermissionChecker = require('./../components/PermissionChecker')
 
 module.exports = {
@@ -41,6 +42,7 @@ module.exports = {
     usersController.register(app)
     permissionsController.register(app)
     databasesController.register(app)
+    queryController.register(app)
 
     app.post('/login', authController.login)
     //app.get('/auth', authController.auth)
