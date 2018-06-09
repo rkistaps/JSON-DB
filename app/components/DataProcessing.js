@@ -7,7 +7,7 @@ module.exports = {
 
     get: function (data, path) {
 
-
+        return getValue(data, this.preparePath(path))
 
     },
 

@@ -32,25 +32,30 @@ module.exports = {
 
     },
 
-    getByUser: function (user, callback) {
+    getByUser: function (user) {
 
-        Engine.queryCoreDb(this.path + '/' + user, (err, result) => {
+        return new Promise((resolve, reject) => {
 
-            callback(err, result)
+            this.getCoreData(this.path + '/' + user)
+                .then((databases) => {
+                    resolve(databases)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
 
         })
 
     },
 
-    hasDatabase: function (user, database, callback) {
+    hasDatabase: function (user, database) {
 
-        this.getByUser(user, (err, result) => {
+        return new Promise((resolve, reject) => {
 
-            if (result.indexOf(database) === -1) {
-                callback(false)
-            } else {
-                callback(true)
-            }
+            this.getByUser(user)
+                .then((databases) => {
+                    resolve(databases.indexOf(database) !== -1)
+                })
 
         })
 
@@ -107,12 +112,6 @@ module.exports = {
                     reject(err)
                 })
 
-
-            // delete db file
-
-
-            //reject(new Error('Failed'));
-
         })
 
     },
@@ -133,21 +132,23 @@ module.exports = {
 
     },
 
-    getCoreData: function () {
+    getCoreData: function (path) {
 
-        return this.getData(conf.engine.coreUser, conf.engine.coreDbName)
+        return this.getData(conf.engine.coreUser, conf.engine.coreDbName, path)
 
     },
 
-    getData: function (username, database) {
+    getData: function (username, database, path) {
 
         return new Promise((resolve, reject) => {
 
-            const path = this.getFilePath(username, database)
+            const filepath = this.getFilePath(username, database)
 
-            fs.readJson(path)
+            fs.readJson(filepath)
                 .then((data) => {
-                    resolve(data)
+
+                    resolve(dp.get(data, path))
+
                 })
                 .catch((err) => {
                     reject(err)
@@ -156,31 +157,6 @@ module.exports = {
         })
 
     },
-
-    // getDbData: function (username, database, callback) {
-
-    //     const path = this.getDBFilePath(username, database)
-
-    //     fs.exists(path, function (exist) {
-
-    //         if (exist) {
-    //             fs.readFile(path, (err, data) => {
-    //                 if (err) throw err;
-
-    //                 data = JSON.parse(data);
-    //                 data = data ? data : {};
-
-    //                 callback(false, data);
-
-    //             });
-    //         } else {
-    //             callback('DB do not exist');
-    //         }
-
-    //     })
-
-
-    // },
 
     getCoreFilePath: function () {
         return this.getFilePath(conf.engine.coreUser, conf.engine.coreDbName)
@@ -193,6 +169,5 @@ module.exports = {
     getFileName: function (name) {
         return name + '.json'
     }
-
 
 }
