@@ -52,18 +52,36 @@ module.exports = {
         // delete
         app.delete(this.path + "/:database", PermChecker.isAuthorized(), (req, res) => {
 
+            DatabaseModel.delete(req.user.username, req.params.database)
+                .then((result) => {
+                    res.send(result)
+                    // res.send(req.user.username)
+                })
+                .catch((err) => {
+                    console.log(err)
+                    res.send(err)
+                })
 
-            DatabaseModel.hasDatabase(req.user.username, req.params.database, (has) => {
+            // DatabaseModel.hasDatabase(req.user.username, req.params.database, (has) => {
 
-                if (has) {
+            //     if (has) {
 
-                    res.send('all good')
+            //         DatabaseModel.delete()
+            //             .then((result) => {
+            //                 res.send(result)
+            //             }).catch((err) => {
+            //                 console.log(err);
 
-                } else {
-                    res.status(400).send('database not found')
-                }
+            //                 res.send(err.message)
+            //             })
 
-            })
+            //         //res.send('all good')
+
+            //     } else {
+            //         res.status(400).send('database not found')
+            //     }
+
+            // })
 
         })
 
