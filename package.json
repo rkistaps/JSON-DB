@@ -1,0 +1,37 @@
+{
+  "name": "json-db",
+  "version": "1.0.0",
+  "description": "JSON db",
+  "main": "index.js",
+  "dependencies": {
+    "bcrypt": "^2.0.1",
+    "express": "^4.16.3",
+    "get-value": "^3.0.1",
+    "joi": "^13.4.0",
+    "jsonwebtoken": "^8.2.2",
+    "mkdirp": "^0.5.1",
+    "nodemon": "^1.17.5",
+    "set-value": "^3.0.0",
+    "unset-value": "^1.0.0",
+    "winston": "^2.4.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rkistaps/JSON-DB.git"
+  },
+  "keywords": [
+    "json",
+    "db",
+    "node"
+  ],
+  "author": "kristaps taube <kristaps.taube@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rkistaps/JSON-DB/issues"
+  },
+  "homepage": "https://github.com/rkistaps/JSON-DB#readme"
+}

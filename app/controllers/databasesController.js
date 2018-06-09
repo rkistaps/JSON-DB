@@ -12,7 +12,7 @@ module.exports = {
     register: function (app) {
 
         // list user databases
-        app.get(this.path + '/list', PermChecker.isAuthorized(), (req, res) => {
+        app.get(this.path, PermChecker.isAuthorized(), (req, res) => {
 
             DatabaseModel.getByUser(req.user.username, (err, list) => {
                 res.send(list)
@@ -46,6 +46,24 @@ module.exports = {
             } else {
                 res.status(400).send(result.details[0].message)
             }
+
+        })
+
+        // delete
+        app.delete(this.path + "/:database", PermChecker.isAuthorized(), (req, res) => {
+
+
+            DatabaseModel.hasDatabase(req.user.username, req.params.database, (has) => {
+
+                if (has) {
+
+                    res.send('all good')
+
+                } else {
+                    res.status(400).send('database not found')
+                }
+
+            })
 
         })
 
