@@ -46,30 +46,14 @@ module.exports = {
                                 })
                                 .catch((err) => {
                                     console.log(err)
-                                    res.status(500).send('Internal server error')
+                                    // res.status(500).send('Internal server error')
+                                    res.status(500).send(err.message)
                                 })
                         }
 
                     }).catch((e) => {
                         res.status(500).send('Interanl server error. Refer to error log')
                     })
-
-
-                // DatabaseModel.getByUser(username, (err, result) => {
-
-                //     if (result.indexOf(database) != -1) {
-                //         res.status(400).send('database already exists')
-                //     } else {
-
-                //         DatabaseModel.create(username, database, (added) => {
-
-                //             res.send(database);
-
-                //         })
-
-                //     }
-
-                // })
 
             } else {
                 res.status(400).send(result.details[0].message)

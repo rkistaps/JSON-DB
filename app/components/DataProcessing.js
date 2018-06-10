@@ -5,9 +5,20 @@ const unsetValue = require("unset-value");
 
 module.exports = {
 
+    options: {
+        separator: config.engine.pathSeparator
+    },
+
     get: function (data, path) {
 
-        return getValue(data, this.preparePath(path))
+        path = path ? path : '/'
+        path = this.preparePath(path)
+
+        if (path) {
+            return getValue(data, path)
+        } else {
+            return getValue(data)
+        }
 
     },
 
@@ -18,9 +29,11 @@ module.exports = {
     },
 
     preparePath: function (path) {
+
         return path.split(config.engine.pathSeparator).filter((n) => {
             return n ? true : false
         }).join('.')
+
     },
 
 }

@@ -35,15 +35,18 @@ module.exports = {
                 .then((databases) => {
 
                     databases.push(name)
+
                     return this.setCoreData(path, databases)
 
                 })
                 .then((databases) => {
 
-                    // creat db file
+                    // create db file
                     const db_file_path = this.getFilePath(username, name)
                     fs.outputJson(db_file_path, {}).then((data) => {
                         resolve(name)
+                    }).catch((err) => {
+                        reject(err)
                     })
 
                 }).catch((err) => {
@@ -153,13 +156,17 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
 
-            fs.writeJSON(file, data)
-                .then(() => {
-                    resolve()
-                })
-                .catch((err) => {
-                    reject(err)
-                })
+            if (typeof data === 'undefined') {
+                reject("'data' is undefined in saveData")
+            } else {
+                fs.writeJSON(file, data)
+                    .then(() => {
+                        resolve()
+                    })
+                    .catch((err) => {
+                        reject(err)
+                    })
+            }
 
         })
 
@@ -180,7 +187,8 @@ module.exports = {
             fs.readJson(filepath)
                 .then((data) => {
 
-                    resolve(dp.get(data, path))
+                    var result = dp.get(data, path);
+                    resolve(result)
 
                 })
                 .catch((err) => {
@@ -205,9 +213,14 @@ module.exports = {
                 .then((dbdata) => {
 
                     dbdata = dp.set(dbdata, path, data)
-                    this.saveDbData(username, database, dbdata)
 
-                    resolve(data)
+                    this.saveDbData(username, database, dbdata)
+                        .then((data) => {
+                            resolve(data)
+                        })
+                        .catch((err) => {
+                            reject(err)
+                        })
 
                 }).catch((err) => {
                     reject(err)
