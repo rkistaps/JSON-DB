@@ -85,22 +85,6 @@ module.exports = {
 
     },
 
-    set: function (username, database, path, data, callback) {
-
-        Engine.setByPath(username, database, path, data, callback)
-
-    }, set: function (username, database, path, data, callback) {
-
-        Engine.setByPath(username, database, path, data, callback)
-
-    },
-
-    get: function (username, database, path, callback) {
-
-        Engine.queryDbData(username, database, path, callback)
-
-    },
-
     delete: function (username, database) {
 
         var databases;
@@ -142,6 +126,10 @@ module.exports = {
 
         })
 
+    },
+
+    saveCoreData: function (data) {
+        return this.saveDbData(conf.engine.coreUser, conf.engine.coreDbName, data)
     },
 
     saveDbData: function (username, database, data) {

@@ -1,5 +1,7 @@
 const conf = require('./../core/config')
 const Engine = require('./../core/engine')
+const db = require('./database')
+const dp = require('./../components/DataProcessing')
 const Joi = require('joi')
 
 module.exports = {
@@ -11,24 +13,32 @@ module.exports = {
         password: Joi.string().min(3).required(),
     },
 
-    get: function (username, callback) {
+    get: function (username) {
+        return new Promise((resolve, reject) => {
 
-        Engine.queryCoreDb(this.path + '/' + username, function (err, data) {
-
-            callback(err, data)
+            db.getCoreData(this.path + '/' + username)
+                .then((user) => {
+                    resolve(user)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
 
         })
-
     },
 
-    getAll: function (callback) {
+    getAll: function () {
+        return new Promise((resolve, reject) => {
 
-        Engine.queryCoreDb(this.path, function (err, data) {
-
-            callback(err, data)
+            db.getCoreData(this.path)
+                .then((users) => {
+                    resolve(users)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
 
         })
-
     },
 
     validate: function (user) {
@@ -43,20 +53,36 @@ module.exports = {
 
     },
 
-    create: function (user, callback) {
+    create: function (user) {
 
-        if (typeof user.permissions === 'undefined') {
-            user.permissions = []
-        }
+        return new Promise((resolve, reject) => {
 
-        Engine.addUser(user, function (added) {
+            db.getCoreData()
+                .then((coreData) => {
 
-            callback(added ? user : false)
+                    // add to users 
+                    coreData = dp.set(coreData, this.path + '/' + user.username, user)
+
+                    // add to databases
+                    coreData = dp.set(coreData, '/databases/' + user.username, [])
+
+                    db.saveCoreData(coreData)
+                        .then(() => {
+                            resolve(user)
+                        })
+                        .catch((err) => {
+                            reject(err)
+                        })
+
+                })
+                .catch((err) => {
+                    reject(err)
+                })
 
         })
-
     },
 
+    // implement me
     delete: (username, callback) => {
 
         callback(username)
