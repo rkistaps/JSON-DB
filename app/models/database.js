@@ -136,7 +136,19 @@ module.exports = {
 
         const filename = this.getFilePath(username, database)
 
-        return this.saveData(filename, data)
+        return new Promise((resolve, reject) => {
+
+            this.saveData(filename, data)
+                .then((result) => {
+                    resolve(result)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+
+        })
+
+
 
     },
 
@@ -149,7 +161,7 @@ module.exports = {
             } else {
                 fs.writeJSON(file, data)
                     .then(() => {
-                        resolve()
+                        resolve(data)
                     })
                     .catch((err) => {
                         reject(err)
@@ -197,22 +209,27 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
 
-            this.getData(username, database, '/')
-                .then((dbdata) => {
+            if (!path || !data) {
+                reject("'path' and 'data' is required")
+            } else {
 
-                    dbdata = dp.set(dbdata, path, data)
+                this.getData(username, database, '/')
+                    .then((dbdata) => {
 
-                    this.saveDbData(username, database, dbdata)
-                        .then((data) => {
-                            resolve(data)
-                        })
-                        .catch((err) => {
-                            reject(err)
-                        })
+                        dbdata = dp.set(dbdata, path, data)
 
-                }).catch((err) => {
-                    reject(err)
-                })
+                        this.saveDbData(username, database, dbdata)
+                            .then((data) => {
+                                resolve(data)
+                            })
+                            .catch((err) => {
+                                reject(err)
+                            })
+
+                    }).catch((err) => {
+                        reject(err)
+                    })
+            }
 
         })
 

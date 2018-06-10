@@ -1,6 +1,7 @@
 const PermChecker = require('./../components/PermissionChecker')
 const DatabaseModel = require('./../models/database')
 const Engine = require('./../core/engine')
+const messages = require('./../components/messages')
 const Joi = require('joi')
 
 module.exports = {
@@ -22,19 +23,28 @@ module.exports = {
 
             } else {
 
-                DatabaseModel.hasDatabase(req.user.username, req.params.database, (has) => {
+                DatabaseModel.hasDatabase(req.user.username, req.params.database)
+                    .then((result) => {
+                        if (result) {
 
-                    if (has) {
+                            DatabaseModel.setData(req.user.username, req.params.database, req.body.path, req.body.data)
+                                .then((result) => {
 
-                        DatabaseModel.set(req.user.username, req.params.database, req.body.path, req.body.data, () => {
-                            res.send(req.body)
-                        })
+                                    res.send(req.body.data)
 
-                    } else {
-                        res.status(400).send("database does not exist")
-                    }
+                                })
+                                .catch((err) => {
+                                    res.status(500).send(messages.internalError)
+                                })
 
-                })
+
+                        } else {
+                            res.status(400).send(messages.databaseNotFound)
+                        }
+                    })
+                    .catch((err) => {
+                        res.status(500).send(messages.internalError)
+                    })
 
             }
 
@@ -42,36 +52,41 @@ module.exports = {
 
         app.post("/get/:database", PermChecker.isAuthorized(), (req, res) => {
 
-
             const result = Joi.validate(req.body, {
                 path: Joi.string().min(1).required()
             })
 
             if (result.error) {
-
                 res.status(400).send(result.error.details[0].message)
-
             } else {
 
-                DatabaseModel.hasDatabase(req.user.username, req.params.database, (has) => {
+                DatabaseModel.hasDatabase(req.user.username, req.params.database)
+                    .then((result) => {
+                        if (result) {
 
-                    if (has) {
+                            DatabaseModel.getData(req.user.username, req.params.database, req.body.path, req.body.data)
+                                .then((result) => {
 
-                        DatabaseModel.get(req.user.username, req.params.database, req.body.path, (err, data) => {
-                            res.send(data)
-                        })
+                                    res.send(result)
 
-                    } else {
-                        res.status(400).send("database does not exist")
-                    }
+                                })
+                                .catch((err) => {
+                                    res.status(500).send(messages.internalError)
+                                })
 
-                })
+
+                        } else {
+                            res.status(400).send(messages.databaseNotFound)
+                        }
+                    })
+                    .catch((err) => {
+                        res.status(500).send(messages.internalError)
+                    })
 
             }
 
         })
 
     }
-
 
 }
