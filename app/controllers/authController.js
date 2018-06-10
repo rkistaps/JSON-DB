@@ -3,34 +3,32 @@ const functions = require('./../core/functions')
 const engine = require('./../core/engine')
 const UserModel = require('./../models/user')
 const conf = require('./../core/config')
+const Joi = require('joi')
+const messages = require('./../components/messages')
 
-module.exports = {
+const schema = {
+    username: Joi.string().required(),
+    password: Joi.string().required()
+}
 
-    login: function (req, res) {
+module.exports.auth = function (req, res) {
 
-        const body = req.body;
+    const result = Joi.validate(req.body, schema)
 
-        if (body.username && body.password) {
+    if (result.error) {
+        res.status(400).send(result.error.details[0].message)
+    } else {
 
-            UserModel.get(body.username, function (err, user) {
+        UserModel.get(req.body.username)
+            .then((user) => {
+                if (user) {
 
-                if (err) {
-                    res.status(500).send(err)
-                } else {
+                    // res.send(result)
 
-                    if (user) {
+                    functions.comparePasswordPromise(req.body.password, user.password)
+                        .then((match) => {
+                            if (match) {
 
-                        functions.comparePassword(body.password, user.password, function (err, isPasswordMatch) {
-
-                            response = ''
-
-                            if (err) {
-
-                                res.status(500).send(err)
-
-                            } else if (isPasswordMatch) {
-
-                                response = user
                                 jwt.sign(user, conf.jwtSecret, function (err, token) {
 
                                     if (err) {
@@ -44,23 +42,21 @@ module.exports = {
                                 })
 
                             } else {
-                                res.status(400).send("Wrong password")
+                                res.status(400).send(messages.incorrectPassword)
                             }
-
+                        })
+                        .catch((err) => {
+                            res.status(500).send(messages.internalError)
                         })
 
-                    } else {
-                        res.status(400).send('user not found')
-                    }
-
+                } else {
+                    res.status(400).send(messages.userNotFound)
                 }
 
             })
-
-        } else {
-            res.status(400).send("Username and password is mandatory")
-        }
-
+            .catch((err) => {
+                res.status(500).send(messages.internalError)
+            })
 
     }
 

@@ -53,7 +53,8 @@ module.exports = {
     databasesController.register(app)
     queryController.register(app)
 
-    app.post('/login', authController.login)
+    //app.post('/login', authController.login)
+    app.post('/login', authController.auth)
     //app.get('/auth', authController.auth)
 
   }
