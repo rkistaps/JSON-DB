@@ -5,6 +5,7 @@ const UserModel = require('./../models/user')
 const conf = require('./../core/config')
 const Joi = require('joi')
 const messages = require('./../components/messages')
+const log = require('./../components/logger')
 
 const schema = {
     username: Joi.string().required(),
@@ -42,6 +43,7 @@ module.exports.auth = function (req, res) {
                                 })
 
                             } else {
+                                log.error(messages.incorrectPassword)
                                 res.status(400).send(messages.incorrectPassword)
                             }
                         })
