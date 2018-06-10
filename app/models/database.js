@@ -24,10 +24,31 @@ module.exports = {
 
     },
 
-    create: function (username, name, callback) {
+    create: function (username, name) {
 
-        Engine.addDatabase(username, name, (added) => {
-            callback(added)
+        const path = '/databases/' + username
+
+        return new Promise((resolve, reject) => {
+
+            // update core db
+            this.getCoreData(path)
+                .then((databases) => {
+
+                    databases.push(name)
+                    return this.setCoreData(path, databases)
+
+                })
+                .then((databases) => {
+
+                    // creat db file
+                    const db_file_path = this.getFilePath(username, name)
+                    fs.outputJson(db_file_path, {}).then((data) => {
+                        resolve(name)
+                    })
+
+                }).catch((err) => {
+                    reject(err)
+                })
         })
 
     },
@@ -62,6 +83,10 @@ module.exports = {
     },
 
     set: function (username, database, path, data, callback) {
+
+        Engine.setByPath(username, database, path, data, callback)
+
+    }, set: function (username, database, path, data, callback) {
 
         Engine.setByPath(username, database, path, data, callback)
 
@@ -116,6 +141,14 @@ module.exports = {
 
     },
 
+    saveDbData: function (username, database, data) {
+
+        const filename = this.getFilePath(username, database)
+
+        return this.saveData(filename, data)
+
+    },
+
     saveData: function (file, data) {
 
         return new Promise((resolve, reject) => {
@@ -151,6 +184,32 @@ module.exports = {
 
                 })
                 .catch((err) => {
+                    reject(err)
+                })
+
+        })
+
+    },
+
+    setCoreData: function (path, data) {
+
+        return this.setData(conf.engine.coreUser, conf.engine.coreDbName, path, data)
+
+    },
+
+    setData: function (username, database, path, data) {
+
+        return new Promise((resolve, reject) => {
+
+            this.getData(username, database, '/')
+                .then((dbdata) => {
+
+                    dbdata = dp.set(dbdata, path, data)
+                    this.saveDbData(username, database, dbdata)
+
+                    resolve(data)
+
+                }).catch((err) => {
                     reject(err)
                 })
 

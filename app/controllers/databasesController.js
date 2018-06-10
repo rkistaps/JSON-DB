@@ -14,34 +14,62 @@ module.exports = {
         // list user databases
         app.get(this.path, PermChecker.isAuthorized(), (req, res) => {
 
-            DatabaseModel.getByUser(req.user.username, (err, list) => {
-                res.send(list)
-            })
+
+            DatabaseModel.getByUser(req.user.username)
+                .then((list) => {
+                    res.send(list)
+                })
+                .catch((err) => {
+                    res.status(500).send('Internal server error. Refer to error log')
+                })
 
         })
 
         // create new database
         app.post(this.path, PermChecker.isAuthorized(), (req, res) => {
 
+            const username = req.user.username
+            const database = req.body.name
             const result = DatabaseModel.validate(req.body)
 
             if (result === true) { // all good
 
-                DatabaseModel.getByUser(req.user.username, (err, result) => {
+                DatabaseModel.getByUser(username)
+                    .then((databases) => {
 
-                    if (result.indexOf(req.body.name) != -1) {
-                        res.status(400).send('database already exists')
-                    } else {
+                        if (databases.indexOf(database) != -1) {
+                            res.status(400).send('database already exists')
+                        } else {
+                            DatabaseModel.create(username, database)
+                                .then((result) => {
+                                    res.send(result)
+                                })
+                                .catch((err) => {
+                                    console.log(err)
+                                    res.status(500).send('Internal server error')
+                                })
+                        }
 
-                        DatabaseModel.create(req.user.username, req.body.name, (added) => {
+                    }).catch((e) => {
+                        res.status(500).send('Interanl server error. Refer to error log')
+                    })
 
-                            res.send(req.body.name);
 
-                        })
+                // DatabaseModel.getByUser(username, (err, result) => {
 
-                    }
+                //     if (result.indexOf(database) != -1) {
+                //         res.status(400).send('database already exists')
+                //     } else {
 
-                })
+                //         DatabaseModel.create(username, database, (added) => {
+
+                //             res.send(database);
+
+                //         })
+
+                //     }
+
+                // })
 
             } else {
                 res.status(400).send(result.details[0].message)
