@@ -64,7 +64,7 @@ module.exports = {
                     .then((result) => {
                         if (result) {
 
-                            DatabaseModel.getData(req.user.username, req.params.database, req.body.path, req.body.data)
+                            DatabaseModel.getData(req.user.username, req.params.database, req.body.path)
                                 .then((result) => {
 
                                     res.send(result)
