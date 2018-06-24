@@ -3,6 +3,7 @@ const Engine = require('./../core/engine')
 const db = require('./database')
 const dp = require('./../components/DataProcessing')
 const Joi = require('joi')
+const fs = require('fs-extra')
 
 module.exports = {
 
@@ -64,7 +65,7 @@ module.exports = {
                     coreData = dp.set(coreData, this.path + '/' + user.username, user)
 
                     // add to databases
-                    coreData = dp.set(coreData, '/databases/' + user.username, [])
+                    coreData = dp.set(coreData, db.path + '/' + user.username, [])
 
                     db.saveCoreData(coreData)
                         .then(() => {
@@ -83,7 +84,70 @@ module.exports = {
     },
 
     // implement me
-    delete: (username, callback) => {
+    delete: function (username) {
+
+        return new Promise((resolve, reject) => {
+
+            // delete all databases
+            db.getByUser(username)
+                .then((databases) => {
+
+                    db.batchDelete(username, databases)
+                        .then(() => {
+
+                            // delete db dir itself
+                            fs.remove(db.getDirPath(username))
+                                .then(() => {
+
+                                    // update core db
+                                    db.getCoreData()
+                                        .then((coreData) => {
+
+                                            // remove from users 
+                                            // coreData = dp.unset(coreData, this.path + '/' + username)
+
+                                            // remove from databases
+                                            console.log(db.path + '/' + username)
+
+
+                                            console.log(coreData.databases);
+
+                                            coreData = dp.unset(coreData, db.path + '/' + username)
+
+                                            console.log(coreData.databases);
+
+                                            db.saveCoreData(coreData)
+                                                .then(() => {
+                                                    resolve()
+                                                })
+                                                .catch((err) => {
+                                                    reject(err)
+                                                })
+
+                                        })
+                                        .catch((err) => {
+                                            reject(err)
+                                        })
+
+                                })
+
+                        })
+                        .catch((err) => {
+                            reject(err)
+                        })
+
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+
+
+            // remove user from core db
+
+
+
+
+        })
 
         callback(username)
 

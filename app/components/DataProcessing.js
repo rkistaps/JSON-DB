@@ -1,7 +1,10 @@
 const config = require('./../core/config')
 const getValue = require("get-value");
 const setValue = require("set-value");
-const unsetValue = require("unset-value");
+const unsetValue = require('./UnsetValue')
+
+var isObject = require('isobject');
+var has = require('has-value');
 
 module.exports = {
 
@@ -28,12 +31,19 @@ module.exports = {
 
     },
 
+    unset: function (data, path) {
+
+        unsetValue(data, this.preparePath(path))
+        return data
+
+    },
+
     preparePath: function (path) {
 
         return path.split(config.engine.pathSeparator).filter((n) => {
             return n ? true : false
         }).join('.')
 
-    },
+    }
 
 }

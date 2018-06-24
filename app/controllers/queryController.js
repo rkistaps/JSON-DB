@@ -8,6 +8,48 @@ module.exports = {
 
     register: function (app) {
 
+        app.post("/unset/:database", PermChecker.isAuthorized(), (req, res) => {
+
+            const schema = {
+                path: Joi.string().min(1).required()
+            }
+
+            const result = Joi.validate(req.body, schema)
+
+            console.log(result.error)
+
+            if (!result.error) {
+
+                DatabaseModel.hasDatabase(req.user.username, req.params.database)
+                    .then((result) => {
+                        if (result) {
+
+                            DatabaseModel.unsetData(req.user.username, req.params.database, req.body.path)
+                                .then((result) => {
+
+                                    res.send('1')
+
+                                })
+                                .catch((err) => {
+                                    res.status(500).send(messages.internalError)
+                                })
+
+
+                        } else {
+                            res.status(400).send(messages.databaseNotFound)
+                        }
+                    })
+                    .catch((err) => {
+                        res.status(500).send(messages.internalError)
+                    })
+            } else {
+
+                res.status(400).send(result.error.details[0].message)
+
+            }
+
+        })
+
         app.post("/set/:database", PermChecker.isAuthorized(), (req, res) => {
 
             const schema = {

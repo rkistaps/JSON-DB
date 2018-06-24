@@ -53,6 +53,7 @@ module.exports = {
 
         return function (req, res, next) {
 
+            req.user.permissions = typeof req.user.permissions !== 'undefined' ? req.user.permissions : []
             if (req.user && (req.user.permissions.indexOf(permission) !== -1 || req.user.permissions.indexOf('root') !== -1)) {
 
                 next()

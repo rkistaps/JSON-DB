@@ -10,6 +10,11 @@ module.exports = {
         dataDir: __dirname + '/../data',
         pathSeparator: '/'
     },
-    jwtSecret: 'sdjflksjdfljsdlf'
+    jwtSecret: 'sdjflksjdfljsdlf',
+    test: {
+        user: '__test',
+        password: '__test',
+        db: '__test'
+    }
 
 }

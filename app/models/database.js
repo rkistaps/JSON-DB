@@ -85,27 +85,46 @@ module.exports = {
 
     },
 
+    batchDelete: function (username, databases) {
+
+        var index = 0
+
+        const self = this
+
+        return new Promise((resolve, reject) => {
+
+            function next() {
+                if (index < databases.length) {
+                    self.delete(username, databases[index++]).then(next, reject)
+                } else {
+                    resolve()
+                }
+            }
+
+            next()
+
+        })
+
+    },
+
     delete: function (username, database) {
 
-        var databases;
+        const path = this.path + '/' + username;
 
         return new Promise((resolve, reject) => {
 
             // update core db
-            this.getCoreData()
-                .then((data) => {
+            this.getCoreData(path)
+                .then((databases) => {
 
-                    // remove from core db
-                    databases = data.databases[username]
+                    console.log('Path: ' + path);
+                    console.log(databases);
 
                     databases = databases.filter((val) => {
                         return val != database
                     })
 
-                    data = dp.set(data, this.path + '/' + username, databases)
-
-                    // saving core db
-                    return this.saveData(this.getCoreFilePath(), data)
+                    return this.setCoreData(path, databases)
 
                 })
                 .then(() => {
@@ -113,7 +132,7 @@ module.exports = {
                     // delete db file
                     fs.remove(this.getFilePath(username, database))
                         .then(() => {
-                            resolve(databases)
+                            resolve()
                         })
                         .catch((err) => {
                             reject(err)
@@ -235,12 +254,45 @@ module.exports = {
 
     },
 
+    unsetCoreData: function (path) {
+        return this.unsetData(conf.engine.coreUser, conf.engine.coreDbName, path)
+    },
+
+    unsetData: function (username, database, path) {
+
+        return new Promise((resolve, reject) => {
+
+            this.getData(username, database, '/')
+                .then((dbdata) => {
+
+                    dp.unset(dbdata, path)
+
+                    this.saveDbData(username, database, dbdata)
+                        .then(() => {
+                            resolve()
+                        })
+
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+
+
+        })
+
+
+    },
+
     getCoreFilePath: function () {
         return this.getFilePath(conf.engine.coreUser, conf.engine.coreDbName)
     },
 
     getFilePath: function (username, database) {
-        return conf.engine.dataDir + '/' + username + '/' + this.getFileName(database)
+        return this.getDirPath(username) + this.getFileName(database)
+    },
+
+    getDirPath: function (username) {
+        return conf.engine.dataDir + '/' + username + '/'
     },
 
     getFileName: function (name) {

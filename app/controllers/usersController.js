@@ -3,6 +3,7 @@ const Engine = require('./../core/engine')
 const functions = require('./../core/functions')
 const PermChecker = require('./../components/PermissionChecker')
 const conf = require('./../core/config')
+const messages = require('./../components/messages')
 
 module.exports = {
 
@@ -119,11 +120,15 @@ module.exports = {
 
                 if (req.params.username != conf.engine.coreUser) {
 
-                    UserModel.delete(req.params.username, (result) => {
+                    UserModel.delete(req.params.username)
+                        .then((result) => {
+                            res.send(result)
+                        })
+                        .catch((err) => {
+                            console.log(err);
 
-                        res.send('Implement me')
-
-                    })
+                            res.status(500).send(messages.internalError)
+                        })
 
                 } else {
                     res.status(400).send('Cant delete root user')

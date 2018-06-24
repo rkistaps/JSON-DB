@@ -5,21 +5,27 @@
   "main": "index.js",
   "dependencies": {
     "bcrypt": "^2.0.1",
+    "chai": "^4.1.2",
     "date-and-time": "^0.6.2",
     "express": "^4.16.3",
     "fs-extra": "^6.0.1",
     "get-value": "^3.0.1",
+    "has-property": "^1.0.0",
     "joi": "^13.4.0",
     "jsonwebtoken": "^8.2.2",
     "mkdirp": "^0.5.1",
+    "mocha": "^5.2.0",
     "nodemon": "^1.17.5",
     "set-value": "^3.0.0",
     "unset-value": "^1.0.0",
     "winston": "^3.0.0-rc6"
   },
   "devDependencies": {},
+  "directories": {
+    "test": "tests"
+  },
   "scripts": {
-    "test": "test.js"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
